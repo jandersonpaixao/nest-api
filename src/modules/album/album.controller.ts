@@ -6,37 +6,45 @@ import {
   Patch,
   Param,
   Delete,
+  HttpCode,
+  HttpStatus,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { AlbumService } from './album.service';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 
-@Controller('album')
+@Controller('albums')
 export class AlbumController {
-  constructor(private readonly albumService: AlbumService) {}
-
-  @Post()
-  create(@Body() createAlbumDto: CreateAlbumDto) {
-    return this.albumService.create(createAlbumDto);
-  }
+  constructor(private albumService: AlbumService) {}
 
   @Get()
   findAll() {
     return this.albumService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.albumService.findOne(+id);
+  @Get('rank/:rank')
+  findOne(@Param('rank') rank: number) {
+    return this.albumService.findOne(+rank);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAlbumDto: UpdateAlbumDto) {
-    return this.albumService.update(+id, updateAlbumDto);
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  create(@Body() createAlbumDto: CreateAlbumDto) {
+    return this.albumService.create(createAlbumDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.albumService.remove(+id);
+  @Patch('rank/:rank')
+  update(
+    @Param('rank', ParseIntPipe) rank: number,
+    @Body() updateAlbumDto: UpdateAlbumDto,
+  ) {
+    return this.albumService.update(rank, updateAlbumDto);
+  }
+
+  @Delete('rank/:rank')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  remove(@Param('rank', ParseIntPipe) rank: number) {
+    return this.albumService.remove(rank);
   }
 }
