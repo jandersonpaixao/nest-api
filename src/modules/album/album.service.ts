@@ -3,6 +3,37 @@ import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { Album } from './entities/album.entity';
 
+const fs = require('fs');
+const path = require('path');
+
+const filePath = path.join(__dirname, './content.json');
+const data = fs.readFileSync(filePath, 'utf-8');
+console.log('data aqui: ', data);
+console.log('filePath aqui', filePath);
+
+const post = {
+  albums: [],
+  create({ id, content }) {
+    const data = { id, content };
+    post.albums.push(data);
+    fs.writeFileSync(filePath, JSON.stringify(post.albums), (err) => {
+      if (err) throw err;
+      console.log('data save');
+    });
+  },
+  read() {
+    post.albums = JSON.parse(fs.readFileSync(filePath));
+    return post.albums;
+  },
+};
+
+const number = Math.random() * 20;
+
+post.create({
+  id: Date.now(),
+  content: `number ${number}`,
+});
+
 @Injectable()
 export class AlbumService {
   private readonly albums: Album[] = [
