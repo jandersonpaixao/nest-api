@@ -3,123 +3,92 @@ import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { Album } from './entities/album.entity';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const path = require('path');
-
-const filePath = path.join(__dirname, './content.json');
-const data = fs.readFileSync(filePath, 'utf-8');
-console.log('data aqui: ', data);
-console.log('filePath aqui', filePath);
-
-const post = {
-  albums: [],
-  create({ id, content }) {
-    const data = { id, content };
-    post.albums.push(data);
-    fs.writeFileSync(filePath, JSON.stringify(post.albums), (err) => {
-      if (err) throw err;
-      console.log('data save');
-    });
-  },
-  read() {
-    post.albums = JSON.parse(fs.readFileSync(filePath));
-    return post.albums;
-  },
-};
-
-const number = Math.random() * 20;
-
-post.create({
-  id: Date.now(),
-  content: `number ${number}`,
-});
 
 @Injectable()
 export class AlbumService {
-  private readonly albums: Album[] = [
-    {
-      rank: 1,
-      album: 'The Dark Side of the Moon',
-      artist: 'Pink Floyd',
-      description: 'Um dos álbuns mais aclamados de todos os tempos.',
-    },
-    {
-      rank: 2,
-      album: 'The Wall',
-      artist: 'Pink Floyd',
-      description:
-        'The Wall is the eleventh studio album by the English rock band Pink Floyd, released on 30 November 1979.',
-    },
-    {
-      rank: 3,
-      album: 'Atom heart mother',
-      artist: 'Pink Floyd',
-      description:
-        'Atom Heart Mother is the fifth studio album by the English rock band Pink Floyd.',
-    },
-    {
-      rank: 4,
-      album: 'Meddle',
-      artist: 'Pink Floyd',
-      description:
-        'Meddle is the sixth studio album by the English rock band Pink Floyd.',
-    },
-    {
-      rank: 5,
-      album: 'Obscured By Clouds',
-      artist: 'Pink Floyd',
-      description:
-        'Obscured by Clouds is the seventh studio album by the English progressive rock band Pink Floyd.',
-    },
-  ];
+  private readonly filePath = path.join(__dirname, './album.json');
   RANK_LIMIT = 500;
 
+  private readAlbumsFromFile(): Album[] {
+    if (!fs.existsSync(this.filePath)) {
+      fs.writeFileSync(this.filePath, '[]');
+    }
+    const data = fs.readFileSync(this.filePath, 'utf8');
+    return JSON.parse(data);
+  }
+
+  private writeAlbumsToFile(albums: Album[]): void {
+    fs.writeFileSync(
+      this.filePath,
+      JSON.stringify(
+        albums.sort((a, b) => a.rank - b.rank),
+        null,
+        2,
+      ),
+    );
+  }
+
   create(createAlbumDto: CreateAlbumDto) {
-    const existingRank = this.albums.find(
+    const albums = this.readAlbumsFromFile();
+
+    const existingRank = albums.find(
       (album) => album.rank === createAlbumDto.rank,
     );
     if (existingRank) {
-      this.albums.forEach((album) => {
+      albums.forEach((album) => {
         if (album.rank >= createAlbumDto.rank) album.rank++;
         this.remove(this.RANK_LIMIT + 1);
       });
     }
-    this.albums.push(createAlbumDto);
+    albums.push(createAlbumDto);
+    this.writeAlbumsToFile(albums);
   }
 
   findAll() {
-    return this.albums;
+    return this.readAlbumsFromFile();
   }
 
   findOne(rank: number) {
-    return this.albums.find((album) => album.rank === rank);
+    const albums = this.readAlbumsFromFile();
+    return albums.find((album) => album.rank === rank);
   }
 
   update(rank: number, updateAlbumDto: UpdateAlbumDto) {
-    const index = this.albums.findIndex((album) => album.rank == rank);
+    const albums = this.readAlbumsFromFile();
+    const index = albums.findIndex((album) => album.rank == rank);
     if (index == -1) {
       return { updated: false };
     }
-    this.albums[index] = { ...this.albums[index], ...updateAlbumDto };
-    return { updated: true, album: this.albums[index] };
+    albums[index] = { ...albums[index], ...updateAlbumDto };
+    this.writeAlbumsToFile(albums);
+    return { updated: true, album: albums[index] };
   }
 
   remove(rank: number) {
-    const index = this.albums.findIndex((album) => album.rank === rank);
+    const albums = this.readAlbumsFromFile();
+    const index = albums.findIndex((album) => album.rank === rank);
+    console.log('index aqui: ', index);
     if (index == -1) {
       return { delete: false };
     }
-    const deletedAlbum = this.albums.splice(index, 1);
-    this.albums.forEach((album) => {
+    const deletedAlbum = albums.splice(index, 1);
+    albums.forEach((album) => {
       if (album.rank > rank) album.rank--;
     });
-    console.log('albums aqui', this.albums);
-    return { delete: true, album: deletedAlbum };
+    console.log('albums aqui', albums);
+    this.writeAlbumsToFile(albums);
+    return { delete: true, album: deletedAlbum, a: albums };
   }
 }
 
-//persistir os dados no file
-//escrever e atualizar
-// file sistem é async ou sync
-//usando async tem usar o .them()
-//usar json, bom pra lidar com array de objetos
+//entender o que é uma img docker
+//rodar minha aplicação no docker
+//docker file
+//docker compose
+//Require statement not part of import statement.eslint
+//ordenar no momento de ler e escrever
+//arrumar a importação do modulo fs
