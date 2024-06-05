@@ -1,0 +1,20 @@
+[
+  {
+    "rank": 1,
+    "album": "The Dark Side of the Moon",
+    "artist": "Pink Floyd",
+    "description": "Um dos álbuns mais aclamados de todos os tempos."
+  },
+  {
+    "rank": 2,
+    "album": "The Wall",
+    "artist": "Pink Floyd",
+    "description": "The Wall is the eleventh studio album by the English rock band Pink Floyd, released on 30 November 1979."
+  },
+  {
+    "rank": 3,
+    "album": "Obscured By Clouds remaster",
+    "artist": "Pink Floyd",
+    "description": "Obscured by Clouds is the seventh studio album by the English progressive rock band Pink Floyd."
+  }
+]
