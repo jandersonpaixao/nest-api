@@ -23,8 +23,7 @@ services:
     container_name: album_db
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: album_db
+      POSTGRES_PASSWORD: root
     ports:
       - '5432:5432'
     volumes:
@@ -32,3 +31,4 @@ services:
 
 volumes:
   postgres-data:
+# schema e migrations
