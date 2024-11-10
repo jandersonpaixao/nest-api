@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { Album } from './entities/album.entity';
@@ -84,11 +84,3 @@ export class AlbumService {
     return { delete: true, album: deletedAlbum, a: albums };
   }
 }
-
-//entender o que é uma img docker
-//rodar minha aplicação no docker
-//docker file
-//docker compose
-//Require statement not part of import statement.eslint
-//ordenar no momento de ler e escrever
-//arrumar a importação do modulo fs
